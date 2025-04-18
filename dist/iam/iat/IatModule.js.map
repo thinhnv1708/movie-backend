@@ -1,1 +1,0 @@
-{"version":3,"file":"IatModule.js","sourceRoot":"./src/","sources":["iam/iat/IatModule.ts"],"names":[],"mappings":";;;;;;;;;AAAA,2CAAwC;AACxC,mDAAgD;AAWzC,IAAM,SAAS,GAAf,MAAM,SAAS;CAAG,CAAA;AAAZ,8BAAS;oBAAT,SAAS;IATrB,IAAA,eAAM,EAAC;QACN,SAAS,EAAE;YACT;gBACE,OAAO,EAAE,SAAS;gBAClB,QAAQ,EAAE,6BAAa;aACxB;SACF;QACD,OAAO,EAAE,CAAC,SAAS,CAAC;KACrB,CAAC;GACW,SAAS,CAAG"}
