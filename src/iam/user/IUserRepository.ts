@@ -10,7 +10,7 @@ export interface IUserRepository {
       isRoot: boolean;
       activated: boolean;
       email: string;
-      lastLogin: number;
+      lastAccess: number;
       createdAt: number;
       updatedAt: number;
     }[];
@@ -23,7 +23,7 @@ export interface IUserRepository {
     activated: boolean;
     email: string;
     password: string;
-    lastLogin: number;
+    lastAccess: number;
     createdAt: number;
     updatedAt: number;
   }>;
@@ -34,7 +34,7 @@ export interface IUserRepository {
     activated: boolean;
     email: string;
     password: string;
-    lastLogin: number;
+    lastAccess: number;
     createdAt: number;
     updatedAt: number;
   }>;

@@ -16,14 +16,16 @@ async function bootstrap() {
   // filters scan right to left
   app.useGlobalFilters(new UncatchExeptionFilter(), new HttpExceptionFilter());
 
-  const documentConfig = new DocumentBuilder()
-    .setTitle('Movie API')
-    .addBearerAuth()
-    .build();
-  const documentFactory = () =>
-    SwaggerModule.createDocument(app, documentConfig);
+  if (appConfig.deploymentEnv !== 'production') {
+    const documentConfig = new DocumentBuilder()
+      .setTitle('Movie API')
+      .addBearerAuth()
+      .build();
+    const documentFactory = () =>
+      SwaggerModule.createDocument(app, documentConfig);
 
-  SwaggerModule.setup('document', app, documentFactory);
+    SwaggerModule.setup('document', app, documentFactory);
+  }
 
   await app.listen(appConfig.port);
 }

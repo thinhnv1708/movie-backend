@@ -1,12 +1,12 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { In, Repository } from 'typeorm';
-import { UserEntity } from '../../postgre/entities/UserEntity';
-import { IAuthRepository } from './IAuthRepository';
-import { UserPolicyEntity } from '../../postgre/entities/UserPolicyEntity';
-import { GroupPolicyEntity } from '../../postgre/entities/GroupPolicyEntity';
-import { UserGroupEntity } from '../../postgre/entities/UserGroupEntity';
-import { PolicyActionEntity } from '../../postgre/entities/PolicyActionEntity';
 import { ActionEntity } from '../../postgre/entities/ActionEntity';
+import { GroupPolicyEntity } from '../../postgre/entities/GroupPolicyEntity';
+import { PolicyActionEntity } from '../../postgre/entities/PolicyActionEntity';
+import { UserEntity } from '../../postgre/entities/UserEntity';
+import { UserGroupEntity } from '../../postgre/entities/UserGroupEntity';
+import { UserPolicyEntity } from '../../postgre/entities/UserPolicyEntity';
+import { IAuthRepository } from './IAuthRepository';
 
 @Injectable()
 export class AuthRepository implements IAuthRepository {
@@ -21,9 +21,7 @@ export class AuthRepository implements IAuthRepository {
     private groupPolicyModel: Repository<GroupPolicyEntity>,
     @Inject(PolicyActionEntity)
     private policyActionModel: Repository<PolicyActionEntity>,
-  ) {
-    this.getUserActions('2a0f7c1d-0026-4c8d-8ce7-389bfdf971b0');
-  }
+  ) {}
 
   getUserByEmail(email: string): Promise<{
     id: string;

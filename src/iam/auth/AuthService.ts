@@ -53,8 +53,8 @@ export class AuthService {
     });
 
     // Update last login time
-    const lastLoginTimestamp = getTimestampSeconds();
-    await this.authRepo.updateLastAccess(user.id, lastLoginTimestamp);
+    const lastAccessTimestamp = getTimestampSeconds();
+    await this.authRepo.updateLastAccess(user.id, lastAccessTimestamp);
 
     return tokens;
   }
@@ -92,8 +92,8 @@ export class AuthService {
     });
 
     // Update last login time
-    const lastLoginTimestamp = getTimestampSeconds();
-    await this.authRepo.updateLastAccess(decoded.userId, lastLoginTimestamp);
+    const lastAccessTimestamp = getTimestampSeconds();
+    await this.authRepo.updateLastAccess(decoded.userId, lastAccessTimestamp);
 
     return tokens;
   }
