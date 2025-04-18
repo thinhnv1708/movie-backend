@@ -1,0 +1,1 @@
+{"version":3,"file":"MessageMapping.js","sourceRoot":"./src/","sources":["lib/MessageMapping.ts"],"names":[],"mappings":";;AAAA,6CAAsC;AAEtC,kBAAe;IACb,CAAC,oBAAU,CAAC,OAAO,CAAC,EAAE,SAAS;IAC/B,CAAC,oBAAU,CAAC,qBAAqB,CAAC,EAAE,uBAAuB;IAC3D,CAAC,oBAAU,CAAC,cAAc,CAAC,EAAE,gBAAgB;IAC7C,CAAC,oBAAU,CAAC,iBAAiB,CAAC,EAAE,mBAAmB;CACpD,CAAC"}
