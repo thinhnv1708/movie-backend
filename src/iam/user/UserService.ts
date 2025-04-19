@@ -1,14 +1,17 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as crypto from 'crypto';
+import IAppConfig from '../../config/interfaces/IAppConfig';
 import { IIamConfig } from '../../config/interfaces/IIamConfig';
 import BusinessError from '../../lib/BusinessError';
+import { PasswordHandler } from '../../lib/helpers/PasswordHandler';
 import idGenerator from '../../lib/idGenerator';
 import StatusCode from '../../lib/StatusCode';
 import getTimestampSeconds from '../../lib/utils/getTimestampSeconds';
 import { SendMessageService } from '../../send-message/SendMessageService';
+import { getRessetPasswordMessage } from './helpers/getActivateUserMessage';
 import { IUserRepository } from './IUserRepository';
-import { PasswordHandler } from '../../lib/helpers/PasswordHandler';
+import { UserTokenHelper } from '../../lib/helpers/UserTokenHelper';
 
 @Injectable()
 export class UserService {
@@ -16,7 +19,7 @@ export class UserService {
     @Inject('UserRepo') private readonly userRepo: IUserRepository,
     private readonly sendMessageService: SendMessageService,
     private readonly configService: ConfigService,
-    private readonly passwordHandler: PasswordHandler,
+    private readonly userTokenHelper: UserTokenHelper,
   ) {}
 
   async createUser(createUserData: {
@@ -82,12 +85,6 @@ export class UserService {
     return newUser;
   }
 
-  private hashToken(token: string): string {
-    const hash = crypto.createHash('sha256');
-    hash.update(token);
-    return hash.digest('hex');
-  }
-
   private async makeUserToken(data: {
     userId: string;
     expiresIn: number; // seconds
@@ -97,7 +94,7 @@ export class UserService {
     const now = getTimestampSeconds();
     const expiresAt = now + expiresIn;
 
-    const hashedToken = this.hashToken(token);
+    const hashedToken = this.userTokenHelper.hashToken(token);
 
     const userToken = {
       id: idGenerator(),
@@ -125,6 +122,7 @@ export class UserService {
     }
 
     const iamConfig = this.configService.get<IIamConfig>('iam');
+    const appConfig = this.configService.get<IAppConfig>('app');
 
     const token = await this.makeUserToken({
       userId: user.id,
@@ -133,53 +131,20 @@ export class UserService {
 
     const activateUrl = iamConfig.activateUserUrl.replace('{token}', token);
 
-    const sendMessageResponse = await this.sendMessageService.send({
+    const messageContent = await getRessetPasswordMessage({
+      email: user.email,
+      activateUrl,
+      activateUserTokenExpiresIn: iamConfig.activateUserTokenExpiresIn,
+      logoUrl: appConfig.logoUrl,
+    });
+
+    const sendMessageResponse = await this.sendMessageService.sendMessage({
       to: user.email,
-      subject: 'Activate your account',
-      content: `Click here to activate your account: ${activateUrl}`,
+      subject: 'Kích hoạt tài khoản Movie Service',
+      content: messageContent,
     });
 
     return sendMessageResponse;
-  }
-
-  async activateUser(data: { token: string; password: string }) {
-    const { token, password } = data;
-    const hashedToken = this.hashToken(token);
-
-    const userToken = await this.userRepo.getUserTokenByToken(hashedToken);
-
-    if (!userToken) {
-      throw new BusinessError(StatusCode.USER_TOKEN_NOT_FOUND);
-    }
-
-    const now = getTimestampSeconds();
-
-    if (now > userToken.expiresAt) {
-      throw new BusinessError(StatusCode.USER_TOKEN_EXPIRED);
-    }
-
-    const user = await this.userRepo.getUserById(userToken.userId);
-
-    if (!user) {
-      throw new BusinessError(StatusCode.USER_NOT_FOUND);
-    }
-
-    if (user.activated) {
-      throw new BusinessError(StatusCode.USER_ALREADY_ACTIVATED);
-    }
-
-    const iamConfig = this.configService.get<IIamConfig>('iam');
-
-    const hashedPassword = this.passwordHandler.hash(
-      password,
-      iamConfig.passwordSecret,
-    );
-
-    await this.userRepo.updateActivatedUser(user.id, hashedPassword);
-
-    return {
-      message: 'User activated successfully',
-    };
   }
 
   async updateUser(

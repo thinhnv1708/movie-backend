@@ -8,8 +8,6 @@ export class AuthenticationGuard implements CanActivate {
   constructor(private authService: AuthService) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    console.log('AuthenticationGuard called');
-
     const request = context.switchToHttp().getRequest();
     const token = request.headers['authorization']?.split(' ')[1];
 
@@ -19,7 +17,7 @@ export class AuthenticationGuard implements CanActivate {
 
     const decodedToken = await this.authService.verifyToken(token);
 
-    request.tokenPayload = decodedToken;
+    request.userData = decodedToken;
 
     return true;
   }

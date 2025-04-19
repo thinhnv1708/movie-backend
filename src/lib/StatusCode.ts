@@ -6,6 +6,8 @@ enum StatusCode {
   UNAUTHROIZED = 1002,
   FORBIDDEN = 1003,
   INVALID_REFRESH_TOKEN = 1004,
+  INVALID_RESET_TOKEN = 1005,
+  
 
   // 2xxx: IAM related errors
   EMAIL_ALREADY_EXISTS = 2000,
@@ -18,7 +20,10 @@ enum StatusCode {
   USER_NOT_FOUND = 2007,
   INVALID_CREDENTIALS = 2008,
   USER_NOT_ACTIVATED = 2009,
+  INVALID_PASSWORD = 2010,
 
+  // 3xxx: email
+  SEND_EMAIL_FAILED = 3000,
   //9xxx: Internal errors
   INTERNAL_SERVER_ERROR = 9999,
 }

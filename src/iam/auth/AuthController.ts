@@ -1,10 +1,17 @@
 import { Body, Controller, Post, UseInterceptors } from '@nestjs/common';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { ResponseDataInterceptor } from '../../lib/interceptors/ResponseDataInterceptor';
+import {
+  ApiOkResponse,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
+import { ResponseDataInterceptor } from '../../interceptors/ResponseDataInterceptor';
 import { AuthService } from './AuthService';
+import { ActivateUserDto } from './dto/ActivateUserDto';
 import { LoginDto } from './dto/LoginDto';
 import { RefreshTokenDto } from './dto/RefreshTokenDto';
-import { AuthTokensResponseDto } from './dto/responses/AuthTokensResponseDto';
+import { ActivateUserResponseDto } from './dto/responses/ActivateUserResponseDto';
+import { LoginResponseDto } from './dto/responses/LoginResponseDto';
 
 @ApiTags('Authentication')
 @UseInterceptors(ResponseDataInterceptor)
@@ -12,15 +19,24 @@ import { AuthTokensResponseDto } from './dto/responses/AuthTokensResponseDto';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  @ApiOperation({
+    summary: 'Activate user account',
+    description: 'Activates a user account using the provided token',
+  })
+  @ApiOkResponse({
+    description: 'User activated successfully',
+    type: ActivateUserResponseDto,
+  })
+  @Post('/activate')
+  activateUser(@Body() body: ActivateUserDto) {
+    return this.authService.activateUser(body);
+  }
+
   @ApiOperation({ summary: 'Login to the system' })
   @ApiResponse({
     status: 200,
     description: 'Login successful',
-    type: AuthTokensResponseDto,
-  })
-  @ApiResponse({
-    status: 400,
-    description: 'Invalid credentials or user not activated',
+    type: LoginResponseDto,
   })
   @Post('/login')
   async login(@Body() loginDto: LoginDto) {
@@ -31,11 +47,7 @@ export class AuthController {
   @ApiResponse({
     status: 200,
     description: 'Token refresh successful',
-    type: AuthTokensResponseDto,
-  })
-  @ApiResponse({
-    status: 400,
-    description: 'Invalid or expired refresh token',
+    type: LoginResponseDto,
   })
   @Post('/refresh-token')
   async refreshToken(@Body() refreshTokenDto: RefreshTokenDto) {

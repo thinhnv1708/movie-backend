@@ -8,6 +8,7 @@ import IRedisConfig from './config/interfaces/IRedisConfig';
 import { ActionModule } from './iam/action/ActionModule';
 import { AuthModule } from './iam/auth/AuthModule';
 import { GroupModule } from './iam/group/GroupModule';
+import { PersonalizedModule } from './iam/personalized/PersonalizedModule';
 import { PolicyModule } from './iam/policy/PolicyModule';
 import { UserModule } from './iam/user/UserModule';
 import { ValidationPipe } from './lib/pipes/ValidationPipe';
@@ -51,6 +52,7 @@ import { PostgreeModule } from './postgre/PostgreModule';
     UserModule,
     PolicyModule,
     GroupModule,
+    PersonalizedModule,
   ],
   controllers: [AppController],
   providers: [

@@ -1,16 +1,19 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { In, Repository } from 'typeorm';
+import { DataSource, In, Repository } from 'typeorm';
 import { ActionEntity } from '../../postgre/entities/ActionEntity';
 import { GroupPolicyEntity } from '../../postgre/entities/GroupPolicyEntity';
 import { PolicyActionEntity } from '../../postgre/entities/PolicyActionEntity';
 import { UserEntity } from '../../postgre/entities/UserEntity';
 import { UserGroupEntity } from '../../postgre/entities/UserGroupEntity';
 import { UserPolicyEntity } from '../../postgre/entities/UserPolicyEntity';
+import { UserTokenEntity } from '../../postgre/entities/UserTokenEntity';
 import { IAuthRepository } from './IAuthRepository';
 
 @Injectable()
 export class AuthRepository implements IAuthRepository {
   constructor(
+    @Inject('DATA_SOURCE')
+    private dataSource: DataSource,
     @Inject(UserEntity)
     private userModel: Repository<UserEntity>,
     @Inject(UserPolicyEntity)
@@ -21,6 +24,8 @@ export class AuthRepository implements IAuthRepository {
     private groupPolicyModel: Repository<GroupPolicyEntity>,
     @Inject(PolicyActionEntity)
     private policyActionModel: Repository<PolicyActionEntity>,
+    @Inject(UserTokenEntity)
+    private userTokenModel: Repository<UserTokenEntity>,
   ) {}
 
   getUserByEmail(email: string): Promise<{
@@ -42,11 +47,14 @@ export class AuthRepository implements IAuthRepository {
     });
   }
 
-  async getUserById(userId: string): Promise<{ id: string }> {
+  async getUserById(
+    userId: string,
+  ): Promise<{ id: string; activated: boolean }> {
     const user = await this.userModel.findOne({
       where: { id: userId },
       select: {
         id: true,
+        activated: true,
       },
     });
 
@@ -104,6 +112,37 @@ export class AuthRepository implements IAuthRepository {
   async updateLastAccess(userId: string, lastAccess: number): Promise<void> {
     await this.userModel.update(userId, {
       lastAccess,
+    });
+  }
+
+  async getUserTokenByToken(token: string): Promise<{
+    id: string;
+    userId: string;
+    token: string;
+    createdAt: number;
+    expiresAt: number;
+  }> {
+    return this.userTokenModel.findOne({ where: { token } });
+  }
+
+  async updateActivatedUser(userId: string, password: string) {
+    await this.dataSource.transaction(async (transactionalEntityManager) => {
+      const userModel = transactionalEntityManager.getRepository(UserEntity);
+      const userTokenModel =
+        transactionalEntityManager.getRepository(UserTokenEntity);
+
+      await userModel.update(userId, {
+        activated: true,
+        password,
+      });
+
+      await userTokenModel.delete({ userId });
+    });
+  }
+
+  async updatePassword(userId: string, newPasswordHash: string): Promise<void> {
+    await this.userModel.update(userId, {
+      password: newPasswordHash,
     });
   }
 }

@@ -6,7 +6,7 @@ export default (
 
   const value = process.env[key];
 
-  if (!value && isOptional) {
+  if (!value && !isOptional) {
     throw new Error(`Missing environment variable: ${key}`);
   }
 

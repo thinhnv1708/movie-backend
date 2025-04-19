@@ -1,16 +1,24 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
+import * as fs from 'fs';
+import { promisify } from 'util';
+import IAppConfig from '../../config/interfaces/IAppConfig';
 import { IIamConfig } from '../../config/interfaces/IIamConfig';
 import BusinessError from '../../lib/BusinessError';
+import { PasswordHandler } from '../../lib/helpers/PasswordHandler';
+import { UserTokenHelper } from '../../lib/helpers/UserTokenHelper';
 import idGenerator from '../../lib/idGenerator';
-import IIamTokenPayload from '../../lib/interfaces/IIamTokenPayload';
+import IUserData from '../../lib/interfaces/IUserData';
 import StatusCode from '../../lib/StatusCode';
 import { executePromise } from '../../lib/utils/executePromise';
-import { PasswordHandler } from '../../lib/helpers/PasswordHandler';
-import { IIatRepository } from '../iat/IIatRepository';
-import { IAuthRepository } from './IAuthRepository';
 import getTimestampSeconds from '../../lib/utils/getTimestampSeconds';
+import { SendMessageService } from '../../send-message/SendMessageService';
+import { IIatRepository } from '../iat/IIatRepository';
+import { getRessetPasswordMessage } from './helpers/getResetPasswordMessage';
+import { IAuthRepository } from './IAuthRepository';
+
+const readFileAsync = promisify(fs.readFile);
 
 @Injectable()
 export class AuthService {
@@ -20,6 +28,8 @@ export class AuthService {
     private readonly configService: ConfigService,
     private readonly passwordHandler: PasswordHandler,
     @Inject('IatRepo') private readonly iatRepo: IIatRepository,
+    private readonly sendMessageService: SendMessageService,
+    private readonly userTokenHelper: UserTokenHelper,
   ) {}
 
   async login(email: string, password: string) {
@@ -133,7 +143,7 @@ export class AuthService {
     const iamConfig = this.configService.get<IIamConfig>('iam');
 
     const [error, decoded] = await executePromise(
-      this.jwtService.verifyAsync<IIamTokenPayload>(token, {
+      this.jwtService.verifyAsync<IUserData>(token, {
         secret: iamConfig.jwtAccessTokenSecret,
       }),
     );
@@ -201,5 +211,156 @@ export class AuthService {
     }
 
     return new RegExp(`^${pathComponents.join('\/')}$`);
+  }
+
+  async forgotPassword(email: string) {
+    // Get user by email
+    const user = await this.authRepo.getUserByEmail(email);
+    if (!user) {
+      // We don't want to reveal if a user exists or not for security reasons
+      return {
+        message:
+          'If your email exists in our system, you will receive a password reset link',
+      };
+    }
+
+    // Check if user is activated
+    if (!user.activated) {
+      return {
+        message:
+          'If your email exists in our system, you will receive a password reset link',
+      };
+    }
+
+    // Generate password reset token
+    const resetToken = await this.generatePasswordResetToken(user.id);
+
+    // Replace placeholders with actual values
+    const iamConfig = this.configService.get<IIamConfig>('iam');
+    const appConfig = this.configService.get<IAppConfig>('app');
+
+    const resetUrl = `${iamConfig.resetPasswordUrl}?token=${resetToken}`;
+
+    const messageContent = await getRessetPasswordMessage({
+      resetUrl,
+      resetTokenExpiresIn: iamConfig.resetTokenExpiresIn,
+      logoUrl: appConfig.logoUrl,
+    });
+
+    // Send password reset email
+    await this.sendMessageService.sendMessage({
+      to: email,
+      subject: 'Password Reset Request',
+      content: messageContent,
+    });
+
+    return {
+      message:
+        'If your email exists in our system, you will receive a password reset link',
+    };
+  }
+
+  async resetPassword(token: string, newPassword: string) {
+    // Verify the reset token
+    const iamConfig = this.configService.get<IIamConfig>('iam');
+
+    const [error, decoded] = await executePromise(
+      this.jwtService.verifyAsync<{
+        jti: string;
+        userId: string;
+        type: string;
+        iat: number;
+        exp: number;
+      }>(token, {
+        secret: iamConfig.jwtResetTokenSecret,
+      }),
+    );
+
+    if (error || decoded.type !== 'reset') {
+      throw new BusinessError(StatusCode.INVALID_RESET_TOKEN);
+    }
+
+    // Get user
+    const user = await this.authRepo.getUserById(decoded.userId);
+    if (!user) {
+      throw new BusinessError(StatusCode.INVALID_RESET_TOKEN);
+    }
+
+    // Hash the new password
+    const newPasswordHash = this.passwordHandler.hash(
+      newPassword,
+      iamConfig.passwordSecret,
+    );
+
+    // Update the password
+    await this.authRepo.updatePassword(decoded.userId, newPasswordHash);
+
+    // Invalidate all tokens by updating the IAT
+    const iatTimestamp = getTimestampSeconds();
+    await this.iatRepo.setIat(
+      decoded.userId,
+      iatTimestamp,
+      iamConfig.jwtRefreshTokenExpiresIn,
+    );
+
+    return { message: 'Password has been reset successfully' };
+  }
+
+  private async generatePasswordResetToken(userId: string) {
+    const iamConfig = this.configService.get<IIamConfig>('iam');
+
+    // Generate reset token
+    const resetTokenPayload = {
+      jti: idGenerator(),
+      userId,
+      type: 'reset',
+    };
+
+    const resetToken = this.jwtService.sign(resetTokenPayload, {
+      secret: iamConfig.jwtResetTokenSecret,
+      expiresIn: iamConfig.resetTokenExpiresIn,
+    });
+
+    return resetToken;
+  }
+
+  async activateUser(data: { token: string; password: string }) {
+    const { token, password } = data;
+    const hashedToken = this.userTokenHelper.hashToken(token);
+
+    const userToken = await this.authRepo.getUserTokenByToken(hashedToken);
+
+    if (!userToken) {
+      throw new BusinessError(StatusCode.USER_TOKEN_NOT_FOUND);
+    }
+
+    const now = getTimestampSeconds();
+
+    if (now > userToken.expiresAt) {
+      throw new BusinessError(StatusCode.USER_TOKEN_EXPIRED);
+    }
+
+    const user = await this.authRepo.getUserById(userToken.userId);
+
+    if (!user) {
+      throw new BusinessError(StatusCode.USER_NOT_FOUND);
+    }
+
+    if (user.activated) {
+      throw new BusinessError(StatusCode.USER_ALREADY_ACTIVATED);
+    }
+
+    const iamConfig = this.configService.get<IIamConfig>('iam');
+
+    const hashedPassword = this.passwordHandler.hash(
+      password,
+      iamConfig.passwordSecret,
+    );
+
+    await this.authRepo.updateActivatedUser(user.id, hashedPassword);
+
+    return {
+      message: 'User activated successfully',
+    };
   }
 }

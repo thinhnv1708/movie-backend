@@ -15,26 +15,21 @@ import {
   ApiOkResponse,
   ApiOperation,
   ApiQuery,
-  ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
 import { AuthenticationGuard } from '../../guards/AuthenticationGuard';
 import { AuthorizationGuard } from '../../guards/AuthorizationGuard';
-import { ResponseDataInterceptor } from '../../lib/interceptors/ResponseDataInterceptor';
+import { ResponseDataInterceptor } from '../../interceptors/ResponseDataInterceptor';
 import { LimitConverterPipe } from '../../lib/pipes/LimitConverterPipe';
 import { PageConverterPipe } from '../../lib/pipes/PageConverterPipe';
 import { UserService } from './UserService';
-import { ActivateUserDto } from './dto/ActivateUserDto';
 import { CreateUserDto } from './dto/CreateUserDto';
 import { SendMessageActivateUserDto } from './dto/SendMessageActivateUserDto';
 import { UpdateUserDto } from './dto/UpdateUserDto';
-import {
-  ActivateUserResponseDto,
-  CreateUserResponseDto,
-  SendActivateUserResponseDto,
-  UserDetailResponseDto,
-  UsersResponseDto,
-} from './dto/response';
+import { CreateUserResponseDto } from './dto/response/CreateUserResponseDto';
+import { SendActivateUserResponseDto } from './dto/response/SendActivateUserResponseDto';
+import { UserDetailResponseDto } from './dto/response/UserDetailResponseDto';
+import { UsersResponseDto } from './dto/response/UsersResponseDto';
 
 @ApiTags('User Management')
 @ApiBearerAuth()
@@ -99,29 +94,6 @@ export class UserController {
   @Post('/sendMessageActivateUser')
   sendMessageActivateUser(@Body() body: SendMessageActivateUserDto) {
     return this.userService.sendMessageActivateUser(body.userId);
-  }
-
-  @ApiOperation({
-    summary: 'Activate user account',
-    description: 'Activates a user account using the provided token',
-  })
-  @ApiOkResponse({
-    description: 'User activated successfully',
-    type: ActivateUserResponseDto,
-  })
-  @ApiResponse({
-    status: 400,
-    description: 'Invalid or expired token',
-    schema: {
-      example: {
-        statusCode: 400,
-        message: 'Token expired or not found',
-      },
-    },
-  })
-  @Post('/activate')
-  activateUser(@Body() body: ActivateUserDto) {
-    return this.userService.activateUser(body);
   }
 
   @ApiOperation({ summary: 'Update a user' })

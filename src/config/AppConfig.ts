@@ -6,5 +6,6 @@ export default (): { app: IAppConfig } => ({
     deploymentEnv:
       getEnv('DEPLOYMENT_ENV', { isOptional: true }) || 'development',
     port: Number(getEnv('PORT', { isOptional: true })) || 3000,
+    logoUrl: getEnv('LOGO_URL', { isOptional: true }),
   },
 });

@@ -1,3 +1,3 @@
 export interface ISender<T> {
-  send(data: T);
+  sendMessage(data: T): Promise<{ message: string }>;
 }

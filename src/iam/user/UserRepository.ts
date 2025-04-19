@@ -1,13 +1,13 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { DataSource, In, Like, Repository } from 'typeorm';
+import { getSkip } from '../../lib/utils/getSkip';
 import { GroupEntity } from '../../postgre/entities/GroupEntity';
 import { PolicyEntity } from '../../postgre/entities/PolicyEntity';
 import { UserEntity } from '../../postgre/entities/UserEntity';
 import { UserGroupEntity } from '../../postgre/entities/UserGroupEntity';
 import { UserPolicyEntity } from '../../postgre/entities/UserPolicyEntity';
-import { IUserRepository } from './IUserRepository';
 import { UserTokenEntity } from '../../postgre/entities/UserTokenEntity';
-import { getSkip } from '../../lib/utils/getSkip';
+import { IUserRepository } from './IUserRepository';
 @Injectable()
 export class UserRepository implements IUserRepository {
   constructor(
@@ -19,8 +19,6 @@ export class UserRepository implements IUserRepository {
     private policyModel: Repository<PolicyEntity>,
     @Inject(GroupEntity)
     private groupModel: Repository<GroupEntity>,
-    @Inject(UserTokenEntity)
-    private userTokenModel: Repository<UserTokenEntity>,
   ) {}
 
   async getUserById(id: string): Promise<{
@@ -176,16 +174,6 @@ export class UserRepository implements IUserRepository {
     });
   }
 
-  async getUserTokenByToken(token: string): Promise<{
-    id: string;
-    userId: string;
-    token: string;
-    createdAt: number;
-    expiresAt: number;
-  }> {
-    return this.userTokenModel.findOne({ where: { token } });
-  }
-
   async updateActivatedUser(userId: string, password: string) {
     await this.dataSource.transaction(async (transactionalEntityManager) => {
       const userModel = transactionalEntityManager.getRepository(UserEntity);
@@ -198,6 +186,13 @@ export class UserRepository implements IUserRepository {
       });
 
       await userTokenModel.delete({ userId });
+    });
+  }
+
+  async updateUserPassword(userId: string, newPassword: string) {
+    await this.userModel.update(userId, {
+      password: newPassword,
+      updatedAt: Math.floor(Date.now() / 1000), // Current timestamp in seconds
     });
   }
 

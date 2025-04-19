@@ -7,7 +7,7 @@ import {
 } from '@nestjs/swagger';
 import { AuthenticationGuard } from '../../guards/AuthenticationGuard';
 import { AuthorizationGuard } from '../../guards/AuthorizationGuard';
-import { ResponseDataInterceptor } from '../../lib/interceptors/ResponseDataInterceptor';
+import { ResponseDataInterceptor } from '../../interceptors/ResponseDataInterceptor';
 import { ActionService } from './ActionService';
 import { ActionsResponseDto } from './dto/ActionsResponseDto';
 

@@ -19,15 +19,13 @@ import {
 } from '@nestjs/swagger';
 import { AuthenticationGuard } from '../../guards/AuthenticationGuard';
 import { AuthorizationGuard } from '../../guards/AuthorizationGuard';
-import { ResponseDataInterceptor } from '../../lib/interceptors/ResponseDataInterceptor';
+import { ResponseDataInterceptor } from '../../interceptors/ResponseDataInterceptor';
 import { LimitConverterPipe } from '../../lib/pipes/LimitConverterPipe';
 import { PageConverterPipe } from '../../lib/pipes/PageConverterPipe';
 import { CreatePolicyDto } from './dto/CreatePolicyDto';
-import {
-  CreatePolicyResponseDto,
-  PoliciesResponseDto,
-  PolicyDetailResponseDto,
-} from './dto/responses';
+import { CreatePolicyResponseDto } from './dto/response/CreatePolicyResponseDto';
+import { PoliciesResponseDto } from './dto/response/PoliciesResponseDto';
+import { PolicyDetailResponseDto } from './dto/response/PolicyDetailResponseDto';
 import { UpdatePolicyDto } from './dto/UpdatePolicyDto';
 import { PolicyService } from './PolicyService';
 

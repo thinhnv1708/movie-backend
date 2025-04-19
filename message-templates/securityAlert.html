@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Security Alert</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .logo {
+      max-width: 150px;
+    }
+    .content {
+      background-color: #f9f9f9;
+      border-radius: 5px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    .alert {
+      color: #721c24;
+      background-color: #f8d7da;
+      border-radius: 5px;
+      padding: 10px;
+      margin: 20px 0;
+    }
+    .info-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+    }
+    .info-table td {
+      padding: 8px;
+      border-bottom: 1px solid #ddd;
+    }
+    .info-table tr:last-child td {
+      border-bottom: none;
+    }
+    .info-table td:first-child {
+      font-weight: bold;
+      width: 40%;
+    }
+    .button {
+      display: inline-block;
+      background-color: #dc3545;
+      color: white;
+      text-decoration: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      margin: 20px 0;
+    }
+    .footer {
+      font-size: 12px;
+      color: #777;
+      text-align: center;
+      margin-top: 30px;
+      border-top: 1px solid #eee;
+      padding-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <img src="{{logoUrl}}" alt="Company Logo" class="logo">
+    <h1>Security Alert</h1>
+  </div>
+  
+  <div class="content">
+    <p>Hello {{name}},</p>
+    
+    <div class="alert">
+      <p>We detected a {{activityType}} on your account.</p>
+    </div>
+    
+    <p>We noticed a recent activity on your account that you should be aware of. Here are the details:</p>
+    
+    <table class="info-table">
+      <tr>
+        <td>Activity:</td>
+        <td>{{activityType}}</td>
+      </tr>
+      <tr>
+        <td>Date & Time:</td>
+        <td>{{timestamp}}</td>
+      </tr>
+      <tr>
+        <td>IP Address:</td>
+        <td>{{ipAddress}}</td>
+      </tr>
+      <tr>
+        <td>Device:</td>
+        <td>{{device}}</td>
+      </tr>
+      <tr>
+        <td>Location:</td>
+        <td>{{location}}</td>
+      </tr>
+    </table>
+    
+    <p>If this was you, you can ignore this email.</p>
+    
+    <p>If you don't recognize this activity, your account may have been compromised. Please take immediate action:</p>
+    
+    <div style="text-align: center;">
+      <a href="{{securityUrl}}" class="button">Secure My Account</a>
+    </div>
+  </div>
+  
+  <div class="footer">
+    <p>For security reasons, we recommend regularly updating your password and using two-factor authentication.</p>
+    <p>If you have any questions, please contact our support team immediately.</p>
+    <p>&copy; {{currentYear}} Your Company. All rights reserved.</p>
+  </div>
+</body>
+</html>

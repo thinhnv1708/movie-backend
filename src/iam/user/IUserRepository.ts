@@ -71,14 +71,6 @@ export interface IUserRepository {
     expiresAt: number;
   }): Promise<void>;
 
-  getUserTokenByToken(token: string): Promise<{
-    id: string;
-    userId: string;
-    token: string;
-    createdAt: number;
-    expiresAt: number;
-  }>;
-
   updateActivatedUser(userId: string, password: string);
 
   deleteUser(userId: string);

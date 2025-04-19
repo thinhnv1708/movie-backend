@@ -7,10 +7,18 @@ import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule } from '@nestjs/config';
 import { PasswordHandler } from '../../lib/helpers/PasswordHandler';
 import { IatModule } from '../iat/IatModule';
+import { UserTokenHelper } from '../../lib/helpers/UserTokenHelper';
+import { SendMessageModule } from '../../send-message/SendMessageModule';
 
 @Global()
 @Module({
-  imports: [UserModule, JwtModule.register({}), ConfigModule, IatModule],
+  imports: [
+    UserModule,
+    JwtModule.register({}),
+    ConfigModule,
+    IatModule,
+    SendMessageModule,
+  ],
   controllers: [AuthController],
   providers: [
     {
@@ -19,6 +27,7 @@ import { IatModule } from '../iat/IatModule';
     },
     AuthService,
     PasswordHandler,
+    UserTokenHelper,
   ],
   exports: [AuthService, 'AuthRepo'],
 })

@@ -11,25 +11,24 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import {
+  ApiBearerAuth,
+  ApiOkResponse,
   ApiOperation,
   ApiQuery,
-  ApiOkResponse,
   ApiTags,
-  ApiBearerAuth,
 } from '@nestjs/swagger';
-import { ResponseDataInterceptor } from '../../lib/interceptors/ResponseDataInterceptor';
+import { ResponseDataInterceptor } from '../../interceptors/ResponseDataInterceptor';
 import { LimitConverterPipe } from '../../lib/pipes/LimitConverterPipe';
 import { PageConverterPipe } from '../../lib/pipes/PageConverterPipe';
 import { GroupService } from './GroupService';
 import { CreateGroupDto } from './dto/CreateGroupDto';
 import { UpdateGroupDto } from './dto/UpdateGroupDto';
-import {
-  CreateGroupResponseDto,
-  GroupDetailResponseDto,
-  GroupsResponseDto,
-} from './dto/responses';
+
 import { AuthenticationGuard } from '../../guards/AuthenticationGuard';
 import { AuthorizationGuard } from '../../guards/AuthorizationGuard';
+import { CreateGroupResponseDto } from './dto/response/CreateGroupResponseDto';
+import { GroupDetailResponseDto } from './dto/response/GroupDetailResponseDto';
+import { GroupsResponseDto } from './dto/response/GroupsResponseDto';
 
 @ApiTags('Groups')
 @ApiBearerAuth()

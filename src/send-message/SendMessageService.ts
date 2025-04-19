@@ -1,11 +1,21 @@
 import { Injectable } from '@nestjs/common';
+import { GmailSender } from './GmailSender';
 
 @Injectable()
 export class SendMessageService {
-  async send(data: any): Promise<{ message: string }> {
-    // Logic to send a message
-    console.log('Message sent:', data);
+  constructor(private readonly gmailSender: GmailSender) {}
 
-    return { message: 'Message sent successfully' };
+  async sendMessage(data: {
+    to: string;
+    subject: string;
+    content: string;
+  }): Promise<{ message: string }> {
+    const { to, subject, content } = data;
+    return this.gmailSender.sendMessage({
+      to,
+      subject,
+      body: content,
+      html: true,
+    });
   }
 }

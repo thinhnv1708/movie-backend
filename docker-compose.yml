@@ -1,29 +1,29 @@
 version: '3.8'
 
 services:
-  app:
-    image: movie-backend:latest
-    ports:
-      - "3000:3000"
-    environment:
-      - DEPLOYMENT_ENV=${DEPLOYMENT_ENV}
-      - PORT=${PORT}
-      - POSTGRES_URL=${POSTGRES_URL}
-      - REDIS_URL=${REDIS_URL}
-      - PASSWORD_SECRET=${PASSWORD_SECRET}
-      - ACTIVATE_USER_URL=${ACTIVATE_USER_URL}
-      - ACTIVATE_USER_TOKEN_EXPIRES_IN=${ACTIVATE_USER_TOKEN_EXPIRES_IN}
-      - JWT_ACCESS_TOKEN_SECRET=${JWT_ACCESS_TOKEN_SECRET}
-      - JWT_ACCESS_TOKEN_EXPIRES_IN=${JWT_ACCESS_TOKEN_EXPIRES_IN}
-      - JWT_REFRESH_TOKEN_SECRET=${JWT_REFRESH_TOKEN_SECRET}
-      - JWT_REFRESH_TOKEN_EXPIRES_IN=${JWT_REFRESH_TOKEN_EXPIRES_IN}
-      - ROOT_USER_EMAIL=${ROOT_USER_EMAIL}
-      - ROOT_USER_PASSWORD=${ROOT_USER_PASSWORD}
-    depends_on:
-      - postgres
-      - redis
-    networks:
-      - movie-network
+  # app:
+  #   image: movie-backend:latest
+  #   ports:
+  #     - "3000:3000"
+  #   environment:
+  #     - DEPLOYMENT_ENV=${DEPLOYMENT_ENV}
+  #     - PORT=${PORT}
+  #     - POSTGRES_URL=${POSTGRES_URL}
+  #     - REDIS_URL=${REDIS_URL}
+  #     - PASSWORD_SECRET=${PASSWORD_SECRET}
+  #     - ACTIVATE_USER_URL=${ACTIVATE_USER_URL}
+  #     - ACTIVATE_USER_TOKEN_EXPIRES_IN=${ACTIVATE_USER_TOKEN_EXPIRES_IN}
+  #     - JWT_ACCESS_TOKEN_SECRET=${JWT_ACCESS_TOKEN_SECRET}
+  #     - JWT_ACCESS_TOKEN_EXPIRES_IN=${JWT_ACCESS_TOKEN_EXPIRES_IN}
+  #     - JWT_REFRESH_TOKEN_SECRET=${JWT_REFRESH_TOKEN_SECRET}
+  #     - JWT_REFRESH_TOKEN_EXPIRES_IN=${JWT_REFRESH_TOKEN_EXPIRES_IN}
+  #     - ROOT_USER_EMAIL=${ROOT_USER_EMAIL}
+  #     - ROOT_USER_PASSWORD=${ROOT_USER_PASSWORD}
+  #   depends_on:
+  #     - postgres
+  #     - redis
+  #   networks:
+  #     - movie-network
 
   postgres:
     image: postgres:15
@@ -31,8 +31,8 @@ services:
       - "5432:5432"
     environment:
       - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD={POSTGRES_PASSWORD}
-      - POSTGRES_DB={POSTGRES_DB}
+      - POSTGRES_PASSWORD=mypassword
+      - POSTGRES_DB=my_db
     volumes:
       - app_data:/var/lib/postgresql/data
     networks:
@@ -43,9 +43,7 @@ services:
     image: redis:7-alpine
     ports:
       - "6379:6379"
-    command: redis-server --requirepass {REDIS_PASSWORD}
-    environment:
-      - REDIS_PASSWORD={REDIS_PASSWORD}
+    command: redis-server --requirepass mypassword
     volumes:
       - app_data:/data
     networks:

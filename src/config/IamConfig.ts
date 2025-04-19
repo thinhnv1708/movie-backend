@@ -20,5 +20,13 @@ export default (): { iam: IIamConfig } => ({
     jwtRefreshTokenExpiresIn:
       Number(getEnv('JWT_REFRESH_TOKEN_EXPIRES_IN', { isOptional: true })) ??
       60 * 60 * 24, // 1 day
+    jwtResetTokenSecret:
+      getEnv('JWT_RESET_TOKEN_SECRET', { isOptional: true }) ??
+      getEnv('PASSWORD_SECRET'), // Fallback to PASSWORD_SECRET if not provided
+    resetTokenExpiresIn:
+      Number(getEnv('RESET_TOKEN_EXPIRES_IN', { isOptional: true })) ??
+      60 * 60 * 24, // 24 hours
+    resetPasswordUrl: getEnv('RESET_PASSWORD_URL', { isOptional: true }) ??
+      'http://localhost:3000/reset-password',
   },
 });
