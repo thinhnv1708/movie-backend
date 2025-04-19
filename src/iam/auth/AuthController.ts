@@ -8,10 +8,12 @@ import {
 import { ResponseDataInterceptor } from '../../interceptors/ResponseDataInterceptor';
 import { AuthService } from './AuthService';
 import { ActivateUserDto } from './dto/ActivateUserDto';
+import { ForgotPasswordDto } from './dto/ForgotPasswordDto';
 import { LoginDto } from './dto/LoginDto';
 import { RefreshTokenDto } from './dto/RefreshTokenDto';
-import { ActivateUserResponseDto } from './dto/responses/ActivateUserResponseDto';
-import { LoginResponseDto } from './dto/responses/LoginResponseDto';
+import { ActivateUserResponseDto } from './dto/response/ActivateUserResponseDto';
+import { ForgotPasswordResponseDto } from './dto/response/ForgotPasswordResponseDto';
+import { LoginResponseDto } from './dto/response/LoginResponseDto';
 
 @ApiTags('Authentication')
 @UseInterceptors(ResponseDataInterceptor)
@@ -49,8 +51,18 @@ export class AuthController {
     description: 'Token refresh successful',
     type: LoginResponseDto,
   })
-  @Post('/refresh-token')
+  @Post('/refreshToken')
   async refreshToken(@Body() refreshTokenDto: RefreshTokenDto) {
     return this.authService.refreshToken(refreshTokenDto.refreshToken);
+  }
+
+  @ApiOperation({ summary: 'Request password reset' })
+  @ApiOkResponse({
+    description: 'Password reset email sent successfully',
+    type: ForgotPasswordResponseDto,
+  })
+  @Post('/sendMessageResetPassword')
+  async sendMessageResetPassword(@Body() forgotPasswordDto: ForgotPasswordDto) {
+    return this.authService.sendMessageResetPassword(forgotPasswordDto.email);
   }
 }

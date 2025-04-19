@@ -26,4 +26,12 @@ export interface IAuthRepository {
   updateActivatedUser(userId: string, password: string);
 
   updatePassword(userId: string, newPasswordHash: string): Promise<void>;
+
+  saveUserToken(data: {
+    id: string;
+    userId: string;
+    token: string;
+    createdAt: number;
+    expiresAt: number;
+  }): Promise<void>;
 }

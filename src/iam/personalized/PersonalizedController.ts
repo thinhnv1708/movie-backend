@@ -34,7 +34,7 @@ export class PersonalizedController {
     description: 'Password changed successfully',
     type: ChangePasswordResponseDto,
   })
-  @Post('/change-password')
+  @Post('/changePassword')
   changePassword(
     @UserData() userData: IUserData,
     @Body() body: ChangePasswordDto,
@@ -51,7 +51,7 @@ export class PersonalizedController {
     description: 'Current user information retrieved successfully',
     type: MyInfoResponseDto,
   })
-  @Get('/my-info')
+  @Get('/myInfo')
   getMyInfo(@UserData() userData: IUserData) {
     return this.personalizedService.getMyInfo(userData.userId);
   }

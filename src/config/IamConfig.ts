@@ -3,30 +3,33 @@ import { IIamConfig } from './interfaces/IIamConfig';
 
 export default (): { iam: IIamConfig } => ({
   iam: {
+    //activate user
     activateUserUrl: getEnv('ACTIVATE_USER_URL'),
     activateUserTokenExpiresIn:
       Number(getEnv('ACTIVATE_USER_TOKEN_EXPIRES_IN', { isOptional: true })) ??
       60 * 60 * 24, // 1 day
     passwordSecret: getEnv('PASSWORD_SECRET'),
-    jwtAccessTokenSecret:
-      getEnv('JWT_ACCESS_TOKEN_SECRET', { isOptional: true }) ??
-      getEnv('PASSWORD_SECRET'), // Fallback to PASSWORD_SECRET if not provided
+
+    jwtAccessTokenSecret: getEnv('JWT_ACCESS_TOKEN_SECRET', {
+      isOptional: true,
+    }),
+
+    // access token
     jwtAccessTokenExpiresIn:
       Number(getEnv('JWT_ACCESS_TOKEN_EXPIRES_IN', { isOptional: true })) ??
       60 * 60, // 1 hour
-    jwtRefreshTokenSecret:
-      getEnv('JWT_REFRESH_TOKEN_SECRET', { isOptional: true }) ??
-      getEnv('PASSWORD_SECRET'), // Fallback to PASSWORD_SECRET if not provided
+
+    // refresh token
+    jwtRefreshTokenSecret: getEnv('JWT_REFRESH_TOKEN_SECRET', {
+      isOptional: true,
+    }),
     jwtRefreshTokenExpiresIn:
       Number(getEnv('JWT_REFRESH_TOKEN_EXPIRES_IN', { isOptional: true })) ??
       60 * 60 * 24, // 1 day
-    jwtResetTokenSecret:
-      getEnv('JWT_RESET_TOKEN_SECRET', { isOptional: true }) ??
-      getEnv('PASSWORD_SECRET'), // Fallback to PASSWORD_SECRET if not provided
-    resetTokenExpiresIn:
-      Number(getEnv('RESET_TOKEN_EXPIRES_IN', { isOptional: true })) ??
+    // reset password
+    resetPasswordUrl: getEnv('RESET_PASSWORD_URL'),
+    resetPasswordTokenExpiresIn:
+      Number(getEnv('RESET_PASSWORD_TOKEN_EXPIRES_IN', { isOptional: true })) ??
       60 * 60 * 24, // 24 hours
-    resetPasswordUrl: getEnv('RESET_PASSWORD_URL', { isOptional: true }) ??
-      'http://localhost:3000/reset-password',
   },
 });

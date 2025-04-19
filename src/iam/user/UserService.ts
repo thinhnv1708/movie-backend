@@ -1,17 +1,18 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import * as crypto from 'crypto';
 import IAppConfig from '../../config/interfaces/IAppConfig';
 import { IIamConfig } from '../../config/interfaces/IIamConfig';
 import BusinessError from '../../lib/BusinessError';
-import { PasswordHandler } from '../../lib/helpers/PasswordHandler';
+import { generateUserToken } from '../../lib/helpers/generateUserToken';
+import { UserTokenHelper } from '../../lib/helpers/UserTokenHelper';
 import idGenerator from '../../lib/idGenerator';
 import StatusCode from '../../lib/StatusCode';
 import getTimestampSeconds from '../../lib/utils/getTimestampSeconds';
 import { SendMessageService } from '../../send-message/SendMessageService';
-import { getRessetPasswordMessage } from './helpers/getActivateUserMessage';
+import {
+  getActivateUserMessage
+} from './helpers/getActivateUserMessage';
 import { IUserRepository } from './IUserRepository';
-import { UserTokenHelper } from '../../lib/helpers/UserTokenHelper';
 
 @Injectable()
 export class UserService {
@@ -85,31 +86,6 @@ export class UserService {
     return newUser;
   }
 
-  private async makeUserToken(data: {
-    userId: string;
-    expiresIn: number; // seconds
-  }): Promise<string> {
-    const { userId, expiresIn } = data;
-    const token = crypto.randomBytes(32).toString('hex');
-    const now = getTimestampSeconds();
-    const expiresAt = now + expiresIn;
-
-    const hashedToken = this.userTokenHelper.hashToken(token);
-
-    const userToken = {
-      id: idGenerator(),
-      userId,
-      token: hashedToken,
-      createdAt: now,
-      updatedAt: now,
-      expiresAt,
-    };
-
-    await this.userRepo.saveUserToken(userToken);
-
-    return token;
-  }
-
   async sendMessageActivateUser(userId: string) {
     const user = await this.userRepo.getUserById(userId);
 
@@ -124,19 +100,24 @@ export class UserService {
     const iamConfig = this.configService.get<IIamConfig>('iam');
     const appConfig = this.configService.get<IAppConfig>('app');
 
-    const token = await this.makeUserToken({
+    const userToken = await generateUserToken(this.userTokenHelper, {
       userId: user.id,
       expiresIn: iamConfig.activateUserTokenExpiresIn,
     });
 
-    const activateUrl = iamConfig.activateUserUrl.replace('{token}', token);
+    const activateUrl = iamConfig.activateUserUrl.replace(
+      '{token}',
+      userToken.token,
+    );
 
-    const messageContent = await getRessetPasswordMessage({
+    const messageContent = await getActivateUserMessage({
       email: user.email,
       activateUrl,
       activateUserTokenExpiresIn: iamConfig.activateUserTokenExpiresIn,
       logoUrl: appConfig.logoUrl,
     });
+
+    await this.userRepo.saveUserToken(userToken);
 
     const sendMessageResponse = await this.sendMessageService.sendMessage({
       to: user.email,

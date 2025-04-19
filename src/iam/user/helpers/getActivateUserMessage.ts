@@ -1,7 +1,7 @@
 import * as path from 'path';
 import * as fs from 'fs';
 
-export const getRessetPasswordMessage = async (args: {
+export const getActivateUserMessage = async (args: {
   email: string;
   activateUrl: string;
   activateUserTokenExpiresIn: number;

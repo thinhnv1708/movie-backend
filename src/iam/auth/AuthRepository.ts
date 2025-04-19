@@ -145,4 +145,29 @@ export class AuthRepository implements IAuthRepository {
       password: newPasswordHash,
     });
   }
+
+  async saveUserToken(data: {
+    id: string;
+    userId: string;
+    token: string;
+    createdAt: number;
+    expiresAt: number;
+  }): Promise<void> {
+    const { id, userId, token, createdAt, expiresAt } = data;
+
+    await this.dataSource.transaction(async (transactionalEntityManager) => {
+      const userTokenModel =
+        transactionalEntityManager.getRepository(UserTokenEntity);
+
+      await userTokenModel.delete({ userId });
+
+      await userTokenModel.insert({
+        id,
+        userId,
+        token,
+        createdAt,
+        expiresAt,
+      });
+    });
+  }
 }
