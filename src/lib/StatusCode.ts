@@ -7,7 +7,7 @@ enum StatusCode {
   FORBIDDEN = 1003,
   INVALID_REFRESH_TOKEN = 1004,
   INVALID_RESET_TOKEN = 1005,
-  
+  USER_NO_COOLDOWN_YET = 1006,
 
   // 2xxx: IAM related errors
   EMAIL_ALREADY_EXISTS = 2000,

@@ -3,7 +3,7 @@ import { GmailSender } from './GmailSender';
 
 @Injectable()
 export class SendMessageService {
-  constructor(private readonly gmailSender: GmailSender) {}
+  constructor(private gmailSender: GmailSender) {}
 
   async sendMessage(data: {
     to: string;

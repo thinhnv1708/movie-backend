@@ -8,10 +8,9 @@ import { UserTokenHelper } from '../../lib/helpers/UserTokenHelper';
 import idGenerator from '../../lib/idGenerator';
 import StatusCode from '../../lib/StatusCode';
 import getTimestampSeconds from '../../lib/utils/getTimestampSeconds';
+import { SendMessageCooldownService } from '../../send-message/SendMessageCooldownService';
 import { SendMessageService } from '../../send-message/SendMessageService';
-import {
-  getActivateUserMessage
-} from './helpers/getActivateUserMessage';
+import { getActivateUserMessage } from './helpers/getActivateUserMessage';
 import { IUserRepository } from './IUserRepository';
 
 @Injectable()
@@ -19,6 +18,7 @@ export class UserService {
   constructor(
     @Inject('UserRepo') private readonly userRepo: IUserRepository,
     private readonly sendMessageService: SendMessageService,
+    private readonly sendMessageCooldownService: SendMessageCooldownService,
     private readonly configService: ConfigService,
     private readonly userTokenHelper: UserTokenHelper,
   ) {}
@@ -97,6 +97,9 @@ export class UserService {
       throw new BusinessError(StatusCode.USER_ALREADY_ACTIVATED);
     }
 
+    // check cooldown if no cooldown yet then throw business error
+    await this.sendMessageCooldownService.checkCooldown(user.id);
+
     const iamConfig = this.configService.get<IIamConfig>('iam');
     const appConfig = this.configService.get<IAppConfig>('app');
 
@@ -124,6 +127,8 @@ export class UserService {
       subject: 'Kích hoạt tài khoản Movie Service',
       content: messageContent,
     });
+
+    await this.sendMessageCooldownService.setCooldownAt(user.id);
 
     return sendMessageResponse;
   }

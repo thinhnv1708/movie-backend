@@ -2,13 +2,12 @@ import { ArgumentsHost, Catch, ExceptionFilter } from '@nestjs/common';
 import { Response } from 'express';
 import HttpStatusMapping from '../lib/HttpStatusMapping';
 import IResponseData from '../lib/interfaces/IResponseData';
+import MessageMapping from '../lib/MessageMapping';
 import ResponseDataBuilder from '../lib/ResponseDataBuilder';
 import StatusCode from '../lib/StatusCode';
-import MessageMapping from '../lib/MessageMapping';
 
 @Catch()
 export class UncatchExeptionFilter implements ExceptionFilter {
-  constructor() {}
   catch(exception: Error, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();

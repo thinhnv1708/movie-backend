@@ -10,6 +10,7 @@ export default {
   [StatusCode.UNAUTHROIZED]: 'Unauthorized Access',
   [StatusCode.FORBIDDEN]: 'Access Forbidden',
   [StatusCode.INVALID_REFRESH_TOKEN]: 'Invalid Refresh Token',
+  [StatusCode.USER_NO_COOLDOWN_YET]: 'Please wait for {cooldownRemainder} seconds',
 
   // IAM related errors
   [StatusCode.EMAIL_ALREADY_EXISTS]: 'Email Already Exists',

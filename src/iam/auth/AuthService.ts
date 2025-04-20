@@ -14,6 +14,7 @@ import IUserData from '../../lib/interfaces/IUserData';
 import StatusCode from '../../lib/StatusCode';
 import { executePromise } from '../../lib/utils/executePromise';
 import getTimestampSeconds from '../../lib/utils/getTimestampSeconds';
+import { SendMessageCooldownService } from '../../send-message/SendMessageCooldownService';
 import { SendMessageService } from '../../send-message/SendMessageService';
 import { IIatRepository } from '../iat/IIatRepository';
 import { getRessetPasswordMessage } from './helpers/getResetPasswordMessage';
@@ -30,6 +31,7 @@ export class AuthService {
     private readonly passwordHandler: PasswordHandler,
     @Inject('IatRepo') private readonly iatRepo: IIatRepository,
     private readonly sendMessageService: SendMessageService,
+    private readonly sendMessageCooldownService: SendMessageCooldownService,
     private readonly userTokenHelper: UserTokenHelper,
   ) {}
 
@@ -265,6 +267,8 @@ export class AuthService {
       throw new BusinessError(StatusCode.USER_NOT_ACTIVATED);
     }
 
+    await this.sendMessageCooldownService.checkCooldown(user.id);
+
     const iamConfig = this.configService.get<IIamConfig>('iam');
     const appConfig = this.configService.get<IAppConfig>('app');
 
@@ -289,6 +293,8 @@ export class AuthService {
       subject: 'Password Reset Request',
       content: messageContent,
     });
+
+    await this.sendMessageCooldownService.setCooldownAt(user.id);
 
     return {
       message:
