@@ -5,22 +5,22 @@ import { LockRepository } from './LockRepository';
 @Injectable()
 export class LockService {
   private readonly defaultLockTTL = 10; // seconds
-  private checkLockAgainPeriod = 50; // ms
-  private extendsLockIntervalId: Map<string, NodeJS.Timeout> = new Map();
+  private lockCheckAgainPeriod = 50; // ms
+  private lockTtlExtendsStore: Map<string, NodeJS.Timeout> = new Map();
   constructor(private readonly lockRepo: LockRepository) {}
 
   async acquireLock(
     key: string,
     options?: {
       lockTtl?: number;
-      extendsLockTtl?: boolean;
-      waitForLock?: boolean;
+      lockTtlExtendsEnabled?: boolean;
+      lockWaitEnabled?: boolean;
     },
   ): Promise<boolean> {
     const {
       lockTtl,
-      extendsLockTtl = false,
-      waitForLock = false,
+      lockTtlExtendsEnabled = false,
+      lockWaitEnabled = false,
     } = options || {};
     const newLockTtl = lockTtl || this.defaultLockTTL;
 
@@ -29,29 +29,29 @@ export class LockService {
       newLockTtl,
     );
 
-    if (!successAcquireLock && !waitForLock) {
+    if (!successAcquireLock && !lockWaitEnabled) {
       return false;
     }
 
-    if (!successAcquireLock && waitForLock) {
-      await delay(this.checkLockAgainPeriod);
+    if (!successAcquireLock && lockWaitEnabled) {
+      await delay(this.lockCheckAgainPeriod);
       return this.acquireLock(key, options);
     }
 
-    if (extendsLockTtl) {
+    if (lockTtlExtendsEnabled) {
       const intervalId = this.extendsLockTtl(key, newLockTtl);
-      this.extendsLockIntervalId.set(key, intervalId);
+      this.lockTtlExtendsStore.set(key, intervalId);
     }
 
     return true;
   }
 
   async releaseLock(key: string): Promise<void> {
-    const intervalId = this.extendsLockIntervalId.get(key);
+    const intervalId = this.lockTtlExtendsStore.get(key);
 
     if (intervalId) {
       clearInterval(intervalId);
-      this.extendsLockIntervalId.delete(key);
+      this.lockTtlExtendsStore.delete(key);
     }
 
     await this.lockRepo.deleteLock(key);
