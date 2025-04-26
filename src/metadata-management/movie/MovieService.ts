@@ -116,7 +116,7 @@ export class MovieService {
       countryId: data.countryId,
       currentEpisode: data.currentEpisode,
       totalEpisode: data.totalEpisode,
-      updatedAt: Date.now(),
+      updatedAt: getTimestampSeconds(),
     });
 
     return {

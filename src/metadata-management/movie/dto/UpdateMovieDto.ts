@@ -1,8 +1,18 @@
-import { IsBoolean, IsNumber, IsOptional, IsString } from 'class-validator';
+import {
+  ArrayMinSize,
+  IsArray,
+  IsBoolean,
+  IsNumber,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class UpdateMovieDto {
-  @ApiProperty({ description: 'Whether the movie is a single movie or a series', required: false })
+  @ApiProperty({
+    description: 'Whether the movie is a single movie or a series',
+    required: false,
+  })
   @IsBoolean()
   @IsOptional()
   isSingle?: boolean;
@@ -27,10 +37,12 @@ export class UpdateMovieDto {
   @IsOptional()
   description?: string;
 
-  @ApiProperty({ description: 'ID of the genre', required: false })
-  @IsString()
+  @ApiProperty({ description: 'ID of the category', required: false })
+  @IsString({ each: true })
+  @ArrayMinSize(1)
+  @IsArray()
   @IsOptional()
-  genreId?: string;
+  categoryIds?: string[];
 
   @ApiProperty({ description: 'Whether the movie is active', required: false })
   @IsBoolean()
@@ -47,7 +59,10 @@ export class UpdateMovieDto {
   @IsOptional()
   thumbnail?: string;
 
-  @ApiProperty({ description: 'Duration of the movie in minutes', required: false })
+  @ApiProperty({
+    description: 'Duration of the movie in minutes',
+    required: false,
+  })
   @IsNumber()
   @IsOptional()
   duration?: number;

@@ -28,8 +28,8 @@ export class MovieRepository implements IMovieRepository {
     duration: number;
     isActive: boolean;
     isSingle: boolean;
-    categories: { id: string; name: string }[];
-    country: { id: string; name: string };
+    categories: { id: string; name: string; slug: string }[];
+    country: { id: string; name: string; slug: string };
     currentEpisode: number;
     totalEpisode: number;
     createdAt: number;
@@ -44,16 +44,6 @@ export class MovieRepository implements IMovieRepository {
       return null;
     }
 
-    const categories = movie.categories.map((category) => ({
-      id: category.id,
-      name: category.name,
-    }));
-
-    const country = {
-      id: movie.country.id,
-      name: movie.country.name,
-    };
-
     return {
       id: movie.id,
       name: movie.name,
@@ -67,8 +57,16 @@ export class MovieRepository implements IMovieRepository {
       duration: movie.duration,
       isActive: movie.isActive,
       isSingle: movie.isSingle,
-      categories,
-      country,
+      categories: movie.categories.map((category) => ({
+        id: category.id,
+        name: category.name,
+        slug: movie.slug,
+      })),
+      country: {
+        id: movie.country.id,
+        name: movie.country.name,
+        slug: movie.country.slug,
+      },
       currentEpisode: movie.currentEpisode,
       totalEpisode: movie.totalEpisode,
       createdAt: movie.createdAt,
@@ -218,14 +216,16 @@ export class MovieRepository implements IMovieRepository {
         }),
       );
 
-      if (categoryIds.length > 0) {
+      if (categoryIds) {
         await movieCategory.deleteMany({
           movieId: id,
         });
 
-        await movieCategory.insertMany(
-          categoryIds.map((categoryId) => ({ movieId: id, categoryId })),
-        );
+        if (categoryIds.length > 0) {
+          await movieCategory.insertMany(
+            categoryIds.map((categoryId) => ({ movieId: id, categoryId })),
+          );
+        }
       }
     });
   }
@@ -256,8 +256,8 @@ export class MovieRepository implements IMovieRepository {
       duration: number;
       isActive: boolean;
       isSingle: boolean;
-      categories: { id: string; name: string }[];
-      country: { id: string; name: string };
+      categories: { id: string; name: string; slug: string }[];
+      country: { id: string; name: string; slug: string };
       currentEpisode: number;
       totalEpisode: number;
       createdAt: number;
@@ -308,10 +308,12 @@ export class MovieRepository implements IMovieRepository {
           categories: movie.categories.map((category) => ({
             id: category.id,
             name: category.name,
+            slug: category.slug,
           })),
           country: {
             id: movie.country.id,
             name: movie.country.name,
+            slug: movie.country.slug,
           },
           currentEpisode: movie.currentEpisode,
           totalEpisode: movie.totalEpisode,
@@ -335,8 +337,8 @@ export class MovieRepository implements IMovieRepository {
     duration: number;
     isActive: boolean;
     isSingle: boolean;
-    categories: { id: string; name: string }[];
-    country: { id: string; name: string };
+    categories: { id: string; name: string; slug: string }[];
+    country: { id: string; name: string; slug: string };
     currentEpisode: number;
     totalEpisode: number;
     createdAt: number;
@@ -367,10 +369,12 @@ export class MovieRepository implements IMovieRepository {
       categories: movie.categories.map((category) => ({
         id: category.id,
         name: category.name,
+        slug: category.slug,
       })),
       country: {
         id: movie.country.id,
         name: movie.country.name,
+        slug: movie.country.slug,
       },
       currentEpisode: movie.currentEpisode,
       totalEpisode: movie.totalEpisode,

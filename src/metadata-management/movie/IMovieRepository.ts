@@ -12,8 +12,8 @@ export interface IMovieRepository {
     duration: number;
     isActive: boolean;
     isSingle: boolean;
-    categories: { id: string; name: string }[];
-    country: { id: string; name: string };
+    categories: { id: string; name: string; slug: string }[];
+    country: { id: string; name: string; slug: string };
     currentEpisode: number;
     totalEpisode: number;
     createdAt: number;
@@ -85,8 +85,8 @@ export interface IMovieRepository {
       duration: number;
       isActive: boolean;
       isSingle: boolean;
-      categories: { id: string; name: string }[];
-      country: { id: string; name: string };
+      categories: { id: string; name: string; slug: string }[];
+      country: { id: string; name: string; slug: string };
       currentEpisode: number;
       totalEpisode: number;
       createdAt: number;
