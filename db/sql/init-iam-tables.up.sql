@@ -1,4 +1,4 @@
-CREATE TABLE "user" (
+CREATE TABLE  IF NOT EXISTS "user" (
     id VARCHAR NOT NULL PRIMARY KEY,
     is_root BOOLEAN NOT NULL,
     activated BOOLEAN NOT NULL,
@@ -8,14 +8,14 @@ CREATE TABLE "user" (
     created_at INT,
     updated_at INT
 );
-CREATE TABLE "group" (
+CREATE TABLE  IF NOT EXISTS "group" (
     id VARCHAR NOT NULL PRIMARY KEY,
     name VARCHAR NOT NULL,
     description VARCHAR,
     created_at INT,
     updated_at INT
 );
-CREATE TABLE "policy" (
+CREATE TABLE  IF NOT EXISTS "policy" (
     id VARCHAR NOT NULL PRIMARY KEY,
     name VARCHAR NOT NULL,
     description VARCHAR,
@@ -23,7 +23,7 @@ CREATE TABLE "policy" (
     created_at INT,
     updated_at INT
 );
-CREATE TABLE "feature" (
+CREATE TABLE  IF NOT EXISTS "feature" (
     id VARCHAR NOT NULL PRIMARY KEY,
     parent_id VARCHAR,
     name VARCHAR NOT NULL,
@@ -31,7 +31,7 @@ CREATE TABLE "feature" (
     created_at INT,
     updated_at INT
 );
-CREATE TABLE "action" (
+CREATE TABLE  IF NOT EXISTS "action" (
     id VARCHAR NOT NULL PRIMARY KEY,
     feature_id VARCHAR NOT NULL,
     name VARCHAR NOT NULL,
@@ -42,35 +42,35 @@ CREATE TABLE "action" (
     updated_at INT,
     CONSTRAINT fk_action_feature_id_feature_id FOREIGN KEY (feature_id) REFERENCES "feature" (id)
 );
-CREATE TABLE "user_group" (
+CREATE TABLE  IF NOT EXISTS "user_group" (
     user_id VARCHAR NOT NULL,
     group_id VARCHAR NOT NULL,
     UNIQUE (user_id, group_id),
     CONSTRAINT fk_user_group_user_id_user_id FOREIGN KEY (user_id) REFERENCES "user" (id) ON DELETE CASCADE,
     CONSTRAINT fk_user_group_group_id_group_id FOREIGN KEY (group_id) REFERENCES "group" (id) ON DELETE CASCADE
 );
-CREATE TABLE "user_policy" (
+CREATE TABLE  IF NOT EXISTS "user_policy" (
     user_id VARCHAR NOT NULL,
     policy_id VARCHAR NOT NULL,
     UNIQUE (user_id, policy_id),
     CONSTRAINT fk_user_policy_user_id_user_id FOREIGN KEY (user_id) REFERENCES "user" (id) ON DELETE CASCADE,
     CONSTRAINT fk_user_policy_policy_id_policy_id FOREIGN KEY (policy_id) REFERENCES "policy" (id) ON DELETE CASCADE
 );
-CREATE TABLE "policy_action" (
+CREATE TABLE  IF NOT EXISTS "policy_action" (
     policy_id VARCHAR NOT NULL,
     action_id VARCHAR NOT NULL,
     UNIQUE (policy_id, action_id),
     CONSTRAINT fk_policy_action_policy_id_policy_id FOREIGN KEY (policy_id) REFERENCES "policy" (id) ON DELETE CASCADE,
     CONSTRAINT fk_policy_action_action_id_action_id FOREIGN KEY (action_id) REFERENCES "action" (id) ON DELETE CASCADE
 );
-CREATE TABLE "group_policy" (
+CREATE TABLE  IF NOT EXISTS "group_policy" (
     group_id VARCHAR NOT NULL,
     policy_id VARCHAR NOT NULL,
     UNIQUE (group_id, policy_id),
     CONSTRAINT fk_group_policy_group_id_group_id FOREIGN KEY (group_id) REFERENCES "group" (id) ON DELETE CASCADE,
     CONSTRAINT fk_group_policy_policy_id_policy_id FOREIGN KEY (policy_id) REFERENCES "policy" (id) ON DELETE CASCADE
 );
-CREATE TABLE "user_token" (
+CREATE TABLE  IF NOT EXISTS "user_token" (
     id VARCHAR NOT NULL PRIMARY KEY,
     user_id VARCHAR NOT NULL,
     token VARCHAR NOT NULL UNIQUE,

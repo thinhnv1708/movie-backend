@@ -28,6 +28,18 @@ export default {
   // Email errors
   [StatusCode.SEND_EMAIL_FAILED]: 'Failed to Send Email',
 
+  // Movie management errors
+  [StatusCode.MOVIE_NOT_FOUND]: 'Movie Not Found',
+  [StatusCode.MOVIE_SLUG_EXISTS]: 'Movie with this slug already exists',
+  [StatusCode.EPISODE_NOT_FOUND]: 'Episode Not Found',
+  [StatusCode.EPISODE_ORDER_EXISTS]: 'Episode with this order already exists for this movie',
+  [StatusCode.GENRE_NOT_FOUND]: 'Genre Not Found',
+  [StatusCode.GENRE_SLUG_EXISTS]: 'Genre with this slug already exists',
+  [StatusCode.COUNTRY_NOT_FOUND]: 'Country Not Found',
+  [StatusCode.COUNTRY_SLUG_EXISTS]: 'Country with this slug already exists',
+  [StatusCode.CATEGORY_NOT_FOUND]: 'Category Not Found',
+  [StatusCode.CATEGORY_SLUG_EXISTS]: 'Category with this slug already exists',
+
   // Internal errors
   [StatusCode.INTERNAL_SERVER_ERROR]: 'Internal Server Error',
 };

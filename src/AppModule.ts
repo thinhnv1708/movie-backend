@@ -5,14 +5,10 @@ import { APP_PIPE } from '@nestjs/core';
 import { AppController } from './AppController';
 import { AppService } from './AppService';
 import IRedisConfig from './config/interfaces/IRedisConfig';
-import { ActionModule } from './iam/action/ActionModule';
-import { AuthModule } from './iam/auth/AuthModule';
-import { GroupModule } from './iam/group/GroupModule';
-import { PersonalizedModule } from './iam/personalized/PersonalizedModule';
-import { PolicyModule } from './iam/policy/PolicyModule';
-import { UserModule } from './iam/user/UserModule';
+import { IAMModule } from './iam/IAMModule';
 import { ValidationPipe } from './lib/pipes/ValidationPipe';
 import scanFolderSync from './lib/utils/scanFolderSync';
+import { MetadataManagementModule } from './metadata-management/MetadataManagementModule';
 import { PostgreeModule } from './postgre/PostgreModule';
 
 @Module({
@@ -46,13 +42,8 @@ import { PostgreeModule } from './postgre/PostgreModule';
         };
       },
     }),
-    // iam
-    AuthModule,
-    ActionModule,
-    UserModule,
-    PolicyModule,
-    GroupModule,
-    PersonalizedModule,
+    IAMModule,
+    MetadataManagementModule,
   ],
   controllers: [AppController],
   providers: [
